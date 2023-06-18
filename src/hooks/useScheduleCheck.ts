@@ -1,34 +1,33 @@
-// src/store/hooks/useScheduleCheck.ts
-
 import { useEffect } from 'react';
 import { useTrackingStatus } from '../store/hooks/useTrackingStatus';
 import { useUserSchedule } from '../store/hooks/useUserSchedule';
 
-export function useScheduleCheck(interval: number = 30000) {
-  const { toggleTrackingStatus } = useTrackingStatus();
+const CHECK_INTERVAL = 30000;
+
+export function useScheduleCheck() {
+  const { toggleTrackingStatus, trackingState } = useTrackingStatus();
   const { userSchedule } = useUserSchedule();
+
+  const { status, manualStatus } = trackingState;
 
   useEffect(() => {
     function checkSchedule() {
       const now = new Date();
       const currentHour = now.getHours();
 
-      // If current time is outside of schedule, toggle tracking off
-      if (
-        currentHour < userSchedule.startHour ||
-        currentHour >= userSchedule.endHour
-      ) {
+      const isOutsideSchedule =
+        currentHour < userSchedule.startHour &&
+        currentHour >= userSchedule.endHour;
+
+      if (isOutsideSchedule && status && !manualStatus) {
         toggleTrackingStatus();
       }
     }
 
-    // Run the check immediately when the app loads
     checkSchedule();
 
-    // And then every interval ms
-    const id = setInterval(checkSchedule, interval);
+    const id = setInterval(checkSchedule, CHECK_INTERVAL);
 
-    // Cleanup function to clear the interval when the component unmounts
     return () => clearInterval(id);
-  }, [interval, toggleTrackingStatus, userSchedule]); // Rerun if these dependencies change
+  }, [userSchedule, toggleTrackingStatus, status, manualStatus]);
 }

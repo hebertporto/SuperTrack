@@ -3,16 +3,17 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTrackingStatus } from '../../../store/hooks/useTrackingStatus';
 
 const TrackingStatus = () => {
-  const { trackingStatus, toggleTrackingStatus } = useTrackingStatus();
+  const { trackingState, toggleTrackingStatus } = useTrackingStatus();
+  const { status } = trackingState;
   return (
     <View style={styles.container}>
       <View>
         <Text style={styles.textH1}>Tracking Status</Text>
       </View>
       <TouchableOpacity
-        style={[styles.button, trackingStatus ? styles.green : styles.red]}
+        style={[styles.button, status ? styles.green : styles.red]}
         onPress={toggleTrackingStatus}>
-        <Text style={styles.text}>{trackingStatus ? 'ON' : 'OFF'}</Text>
+        <Text style={styles.text}>{status ? 'ON' : 'OFF'}</Text>
       </TouchableOpacity>
     </View>
   );
